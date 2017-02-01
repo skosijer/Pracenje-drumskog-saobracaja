@@ -1,3 +1,4 @@
 ﻿  main.cpp
-  PracenjeDrumskogSaobracaja.vcxproj -> c:\users\stevan\documents\visual studio 2015\Projects\PracenjeDrumskogSaobracaja\x64\Debug\PracenjeDrumskogSaobracaja.exe
-  PracenjeDrumskogSaobracaja.vcxproj -> c:\users\stevan\documents\visual studio 2015\Projects\PracenjeDrumskogSaobracaja\x64\Debug\PracenjeDrumskogSaobracaja.pdb (Partial PDB)
+c:\users\stevan\documents\visual studio 2015\projects\pracenjedrumskogsaobracaja\main.cpp(84): warning C4102: 'cv': unreferenced label
+  PracenjeDrumskogSaobracaja.vcxproj -> C:\Users\Stevan\documents\visual studio 2015\Projects\PracenjeDrumskogSaobracaja\x64\Debug\PracenjeDrumskogSaobracaja.exe
+  PracenjeDrumskogSaobracaja.vcxproj -> C:\Users\Stevan\documents\visual studio 2015\Projects\PracenjeDrumskogSaobracaja\x64\Debug\PracenjeDrumskogSaobracaja.pdb (Partial PDB)
