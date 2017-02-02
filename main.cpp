@@ -27,6 +27,8 @@ double distanceBetweenPoints(cv::Point point1, cv::Point point2);
 void drawAndShowContours(cv::Size imageSize, std::vector<std::vector<cv::Point> > contours, std::string strImageName);
 void drawAndShowContours(cv::Size imageSize, std::vector<Blob> blobs, std::string strImageName);
 void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy);
+bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLinePosition, int &carCount);
+void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 int main(void) {
@@ -37,6 +39,10 @@ int main(void) {
 	cv::Mat imgFrame2;
 
 	std::vector<Blob> blobs;
+
+	cv::Point crossingLine[2];
+
+	int carCount = 0;
 
 	capVideo.open("SnimakAutoputa.mp4");
 
@@ -54,6 +60,14 @@ int main(void) {
 
 	capVideo.read(imgFrame1);
 	capVideo.read(imgFrame2);
+
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.35);
+
+	crossingLine[0].x = 0;
+	crossingLine[0].y = intHorizontalLinePosition;
+
+	crossingLine[1].x = imgFrame1.cols - 1;
+	crossingLine[1].y = intHorizontalLinePosition;
 
 	char chCheckForEscKey = 0;
 
@@ -94,15 +108,21 @@ int main(void) {
 		cv::Mat structuringElement3x3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
 		cv::Mat structuringElement5x5 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 		cv::Mat structuringElement7x7 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
-		cv::Mat structuringElement9x9 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(9, 9));
+		cv::Mat structuringElement15x15 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15));
 
 		//cv:imshow("structuringElement9x9", structuringElement9x9);
 
 		//Dilate - uklanja noise, vrsi izolaciju individualnih elemenata na slici, "siri" trenutne elemente, upotpunjuje ih
-		cv::dilate(imgThresh, imgThresh, structuringElement5x5);
-		cv::dilate(imgThresh, imgThresh, structuringElement5x5);
+		//cv::dilate(imgThresh, imgThresh, structuringElement5x5);
+		//cv::dilate(imgThresh, imgThresh, structuringElement5x5);
 		//Erode - radi u kombinaciji sa dilate, radi kontra efekat uredjivanja "smanjivanja" elemenata na frame-u
-		cv::erode(imgThresh, imgThresh, structuringElement5x5);
+		//cv::erode(imgThresh, imgThresh, structuringElement5x5);
+
+		for (unsigned int i = 0; i < 2; i++) {
+			cv::dilate(imgThresh, imgThresh, structuringElement5x5);
+			cv::dilate(imgThresh, imgThresh, structuringElement5x5);
+			cv::erode(imgThresh, imgThresh, structuringElement5x5);
+		}
 
 		//cv::imshow("IMG TRESH AFTER DILATE", imgThresh);
 
@@ -156,6 +176,17 @@ int main(void) {
 		imgFrame2Copy = imgFrame2.clone();         
 
 		drawBlobInfoOnImage(blobs, imgFrame2Copy);
+
+		bool blnAtLeastOneBlobCrossedTheLine = checkIfBlobsCrossedTheLine(blobs, intHorizontalLinePosition, carCount);
+
+		if (blnAtLeastOneBlobCrossedTheLine == true) {
+			cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_GREEN, 2);
+		}
+		else {
+			cv::line(imgFrame2Copy, crossingLine[0], crossingLine[1], SCALAR_RED, 2);
+		}
+
+		drawCarCountOnImage(carCount, imgFrame2Copy);
 
 		cv::imshow("imgFrame2Copy", imgFrame2Copy);
 
@@ -311,4 +342,45 @@ void drawBlobInfoOnImage(std::vector<Blob> &blobs, cv::Mat &imgFrame2Copy) {
 		}
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLinePosition, int &carCount) {
+	bool blnAtLeastOneBlobCrossedTheLine = false;
+
+	for (auto blob : blobs) {
+
+		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
+			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
+			int currFrameIndex = (int)blob.centerPositions.size() - 1;
+
+			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
+				carCount++;
+				blnAtLeastOneBlobCrossedTheLine = true;
+			}
+		}
+
+	}
+
+	return blnAtLeastOneBlobCrossedTheLine;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+void drawCarCountOnImage(int &carCount, cv::Mat &imgFrame2Copy) {
+
+	int intFontFace = CV_FONT_HERSHEY_SIMPLEX;
+	double dblFontScale = (imgFrame2Copy.rows * imgFrame2Copy.cols) / 300000.0;
+	int intFontThickness = (int)std::round(dblFontScale * 1.5);
+
+	cv::Size textSize = cv::getTextSize(std::to_string(carCount), intFontFace, dblFontScale, intFontThickness, 0);
+
+	cv::Point ptTextBottomLeftPosition;
+
+	ptTextBottomLeftPosition.x = imgFrame2Copy.cols - 1 - (int)((double)textSize.width * 1.25);
+	ptTextBottomLeftPosition.y = (int)((double)textSize.height * 1.25);
+
+	cv::putText(imgFrame2Copy, std::to_string(carCount), ptTextBottomLeftPosition, intFontFace, dblFontScale, SCALAR_GREEN, intFontThickness);
+
+}
+
+
 
