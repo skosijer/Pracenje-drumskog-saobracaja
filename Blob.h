@@ -11,18 +11,26 @@
 class Blob {
 public:
 	// member variables ///////////////////////////////////////////////////////////////////////////
-	std::vector<cv::Point> contour;
+	std::vector<cv::Point> currentContour;
 
-	cv::Rect boundingRect;
+	cv::Rect currentBoundingRect;
 
-	cv::Point centerPosition;
+	std::vector<cv::Point> centerPositions;
 
-	double dblDiagonalSize;
+	double dblCurrentDiagonalSize;
+	double dblCurrentAspectRatio;
 
-	double dblAspectRatio;
+	bool blnCurrentMatchFoundOrNewBlob;
+
+	bool blnStillBeingTracked;
+
+	int intNumOfConsecutiveFramesWithoutAMatch;
+
+	cv::Point predictedNextPosition;
 
 	// function prototypes ////////////////////////////////////////////////////////////////////////
 	Blob(std::vector<cv::Point> _contour);
+	void predictNextPosition(void);
 
 };
 
