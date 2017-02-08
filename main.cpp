@@ -46,10 +46,10 @@ int main(void) {
 
 	capVideo.open("SnimakAutoputa.mp4");
 
-	if (!capVideo.isOpened()) {                                                 // if unable to open video file
-		std::cout << "\nerror reading video file" << std::endl << std::endl;      // show error message
-		_getch();                    // it may be necessary to change or remove this line if not using Windows
-		return(0);                                                              // and exit program
+	if (!capVideo.isOpened()) {                                                
+		std::cout << "\nerror reading video file" << std::endl << std::endl;   
+		_getch();                  
+		return(0);                                                             
 	}
 
 	if (capVideo.get(CV_CAP_PROP_FRAME_COUNT) < 2) {
@@ -83,13 +83,23 @@ int main(void) {
 		cv::Mat imgFrame2Copy = imgFrame2.clone();
 
 		cv::Mat imgDifference;
+		cv::Mat imgDiffsiva;
+		cv::Mat imgDiffboja;
 		cv::Mat imgThresh;
+
+		//cv::absdiff(imgFrame1Copy, imgFrame2Copy, imgDiffboja);
+		//cv::imshow("boja",imgDiffboja);
 
 		//Prebacivanje iz RGB u GRAY
 		cv::cvtColor(imgFrame1Copy, imgFrame1Copy, CV_BGR2GRAY);
 		cv::cvtColor(imgFrame2Copy, imgFrame2Copy, CV_BGR2GRAY);
 
-		//Gausova funkcija zamuti ostrinu slike, treci parametar predstavlja susede na koje se primenje funkcija
+		//cv::absdiff(imgFrame1Copy, imgFrame2Copy, imgDiffsiva);
+		//cv::imshow("siva", imgDiffsiva);
+
+		//Gausova funkcija zamuti ostrinu slike, 
+		//treci parametar predstavlja susede na koje se primenje funkcija
+		//cetvrti parametar metoda ekstrapolacije piksela
 		cv::GaussianBlur(imgFrame1Copy, imgFrame1Copy, cv::Size(5, 5), 0);
 		cv::GaussianBlur(imgFrame2Copy, imgFrame2Copy, cv::Size(5, 5), 0);
 
@@ -105,10 +115,10 @@ int main(void) {
 
 		cv::imshow("imgThresh", imgThresh);
 
-		cv::Mat structuringElement3x3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+		//cv::Mat structuringElement3x3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
 		cv::Mat structuringElement5x5 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
-		cv::Mat structuringElement7x7 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
-		cv::Mat structuringElement15x15 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15));
+		//cv::Mat structuringElement7x7 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(7, 7));
+		//cv::Mat structuringElement15x15 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(15, 15));
 
 		//cv:imshow("structuringElement9x9", structuringElement9x9);
 
@@ -133,13 +143,12 @@ int main(void) {
 		//Pronalazi spoljasnje konture i veze ih u jedan oblik
 		cv::findContours(imgThreshCopy, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
-		
-
 		//Crta konture na prethodno kreiranoj crnom frame-u, -1 je da popuni sve izmedju kontura
 		drawAndShowContours(imgThresh.size(), contours, "imgContours");
 
 		std::vector<std::vector<cv::Point> > convexHulls(contours.size());
 
+		//ruka, konveksni trup
 		for (unsigned int i = 0; i < contours.size(); i++) {
 			cv::convexHull(contours[i], convexHulls[i]);
 		}
