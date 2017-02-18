@@ -44,7 +44,12 @@ int main(void) {
 
 	int carCount = 0;
 
-	capVideo.open("SnimakAutoputa.mp4");
+	//capVideo.open("SnimakAutoputa.mp4");
+	//capVideo.open("SnimakAutoputa1.mp4");
+	capVideo.open("SnimakAutoputa2.mp4");
+	//SnimakAutoputa 0.35
+	//SnimakAutoputa1 0.70
+	//SnimakAutoputa2 0.70
 
 	if (!capVideo.isOpened()) {                                                
 		std::cout << "\nerror reading video file" << std::endl << std::endl;   
@@ -61,7 +66,9 @@ int main(void) {
 	capVideo.read(imgFrame1);
 	capVideo.read(imgFrame2);
 
-	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.35);
+	//int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.35);
+	//int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.70);
+	int intHorizontalLinePosition = (int)std::round((double)imgFrame1.rows * 0.60);
 
 	crossingLine[0].x = 0;
 	crossingLine[0].y = intHorizontalLinePosition;
@@ -357,12 +364,13 @@ bool checkIfBlobsCrossedTheLine(std::vector<Blob> &blobs, int &intHorizontalLine
 	bool blnAtLeastOneBlobCrossedTheLine = false;
 
 	for (auto blob : blobs) {
-
+		
 		if (blob.blnStillBeingTracked == true && blob.centerPositions.size() >= 2) {
 			int prevFrameIndex = (int)blob.centerPositions.size() - 2;
 			int currFrameIndex = (int)blob.centerPositions.size() - 1;
 
-			if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
+			//if (blob.centerPositions[prevFrameIndex].y > intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y <= intHorizontalLinePosition) {
+			if (blob.centerPositions[prevFrameIndex].y <= intHorizontalLinePosition && blob.centerPositions[currFrameIndex].y > intHorizontalLinePosition) {
 				carCount++;
 				blnAtLeastOneBlobCrossedTheLine = true;
 			}
