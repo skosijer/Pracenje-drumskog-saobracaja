@@ -11,6 +11,7 @@ Pisana u C++ jeziku. Primenom OpenCV biblioteke.
 + Grupa: 9
 + Asistent: Stefan Andjelić
 + Repozitorijum: [@Pracenje-drumskog-saobracaja](https://github.com/skosijer/Pracenje-drumskog-saobracaja)
+
 # Problem koji se rešava
 
 Primena tehnika računarske inteligencije u praktičnim domenima razvojem odgovarajuće hardverske podrške postaje sve više uobičajena. Jedna od takvih oblasti je i computer vision, gde se složenost problema za koje se nudi rešenje sve više povećava. Oblast koja izaziva dosta pažnje svojim dostignućima, ali i mogućim implikacijama za čovečanstvo jeste razvoj autonomnih sistema, pre svega razvoj sistema za autonomno upravljanje i asistenciju u saobraćaju.
